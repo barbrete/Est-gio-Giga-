@@ -1,0 +1,228 @@
+Option Explicit
+
+Sub Backlog()
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
+    
+    AbrirArquivos
+    LimparDados
+    FormatandoOFS
+    Conveniencia
+    FormatandoAIR
+    Printando
+    Fechando
+
+    Application.ScreenUpdating = True
+    Application.DisplayAlerts = True
+End Sub
+
+Sub AbrirArquivos()
+    Dim pasta As String: pasta = "C:\Users\barbara.gianvechio\Downloads\"
+    Dim pastaDados As String: pastaDados = "C:\Users\barbara.gianvechio\Desktop\Automatizando Backlog\"
+    Dim nomeInicioOFS As String: nomeInicioOFS = "Atividades-Casa Cliente"
+    Dim nomeInicioAIR As String: nomeInicioAIR = "chamados_abertos_field_service"
+    Dim nomeInicioDados As String: nomeInicioDados = "dados_extraidos"
+    
+    AbrirArquivo pasta, nomeInicioAIR, "*.xlsx"
+    AbrirArquivo pasta, nomeInicioOFS, "*.csv"
+    AbrirArquivo pastaDados, nomeInicioDados, "*.xlsx"
+    
+End Sub
+
+Sub AbrirArquivo(ByVal pasta As String, ByVal nomeInicio As String, ByVal extensao As String)
+    Dim arquivo As String
+    arquivo = Dir(pasta & nomeInicio & extensao)
+    
+    If arquivo <> "" Then
+        Workbooks.Open pasta & arquivo
+    Else
+        MsgBox "Nenhum arquivo com o prefixo '" & nomeInicio & "' foi encontrado.", vbExclamation
+    End If
+End Sub
+
+Sub LimparDados()
+    Dim wsBacklogOFS As Worksheet
+    Dim wsBacklogAIR As Worksheet
+    Dim wbBacklog As Workbook
+    Dim ultimalinha As Long
+    
+    Set wbBacklog = Workbooks("BACKLOG - REGIONAL I E II.xlsm")
+    Set wsBacklogOFS = wbBacklog.Sheets("Base- OFS")
+    Set wsBacklogAIR = wbBacklog.Sheets("Base- chamados abertos")
+    
+    ultimalinha = wsBacklogAIR.Cells(wsBacklogAIR.Rows.Count, "AR").End(xlUp).Row
+    wsBacklogAIR.Range("AR1:CF" & ultimalinha).ClearContents
+    
+    ultimalinha = wsBacklogOFS.Cells(wsBacklogOFS.Rows.Count, "G").End(xlUp).Row
+    wsBacklogOFS.Range("G1:AY" & ultimalinha).ClearContents
+    
+End Sub
+
+
+Sub FormatandoOFS()
+    Dim wsOFS As Worksheet
+    Dim wbOFS As Workbook
+    On Error Resume Next
+    
+    Set wbOFS = Workbooks("Atividades-Casa Cliente_07_02_25.csv")
+    On Error GoTo 0
+    
+    If Not wbOFS Is Nothing Then
+        Set wsOFS = wbOFS.Sheets("Atividades-Casa Cliente_07_02_2")
+        If Not wsOFS Is Nothing Then
+            If IsEmpty(wsOFS.Cells(1, 2)) Then
+                wsOFS.Columns("A:A").TextToColumns Destination:=wsOFS.Range("A1"), DataType:=xlDelimited, _
+                    TextQualifier:=xlDoubleQuote, ConsecutiveDelimiter:=False, Tab:=True, _
+                    Semicolon:=True, Comma:=True, Space:=False, Other:=False, FieldInfo:= _
+                    Array(Array(1, 4), Array(2, 3), Array(3, 1), Array(4, 1), Array(5, 1), Array(6, 1), _
+                    Array(7, 1), Array(8, 1), Array(9, 1), Array(10, 1), Array(11, 1), Array(12, 1), _
+                    Array(13, 1), Array(14, 1), Array(15, 1), Array(16, 1), Array(17, 1), Array(18, 1), _
+                    Array(19, 1), Array(20, 1), Array(21, 1), Array(22, 1), Array(23, 1), Array(24, 1), _
+                    Array(25, 1), Array(26, 1), Array(27, 1), Array(28, 1), Array(29, 1), Array(30, 1), _
+                    Array(31, 1), Array(32, 1), Array(33, 1), Array(34, 1), Array(35, 1), Array(36, 1), _
+                    Array(37, 1), Array(38, 1), Array(39, 1), Array(40, 1), Array(41, 1), Array(42, 1), _
+                    Array(43, 1), Array(44, 1)), TrailingMinusNumbers:=True
+            End If
+        
+            wsOFS.Range("A1:AR15000").Copy
+            Windows("BACKLOG - REGIONAL I E II.xlsm").Activate
+            Sheets("Base- OFS").Range("G1").PasteSpecial Paste:=xlPasteAll
+        Else
+            MsgBox "A planilha 'Atividades-Casa Cliente_07_02_25' não foi encontrada.", vbExclamation, "Erro"
+        End If
+    Else
+        MsgBox "A planilha 'OFS' não foi encontrada.", vbExclamation, "Erro"
+    End If
+End Sub
+
+Sub Conveniencia()
+    Dim wbDadosExtraidos As Workbook
+    Dim wsDadosExtraidos As Worksheet
+    Dim wbBacklog As Workbook
+    Dim wsBacklogOFS As Worksheet
+    Dim ultimalinha
+    Dim ultimalinhaConveniencia
+    
+    Set wbDadosExtraidos = Workbooks("dados_extraidos.xlsx")
+    Set wsDadosExtraidos = wbDadosExtraidos.Sheets("Sheet1")
+    Set wbBacklog = Workbooks("BACKLOG - REGIONAL I E II.xlsm")
+    Set wsBacklogOFS = wbBacklog.Sheets("Base- OFS")
+    
+    ultimalinha = wsDadosExtraidos.Cells(wsDadosExtraidos.Rows.Count, "A").End(xlUp).Row
+   
+    wsDadosExtraidos.Range("A2:A" & ultimalinha).Copy
+    
+    ultimalinha = wsBacklogOFS.Cells(wsDadosExtraidos.Rows.Count, "G").End(xlUp).Row
+    ultimalinha = ultimalinha + 1
+    wsBacklogOFS.Range("AI" & ultimalinha).PasteSpecial Paste:=xlPasteAll
+    
+    ultimalinhaConveniencia = wsBacklogOFS.Cells(wsBacklogOFS.Rows.Count, "AI").End(xlUp).Row
+    
+    wsBacklogOFS.Range("I" & ultimalinha & ":I" & ultimalinhaConveniencia).Value = "CONVENIENCIA"
+
+    Application.CutCopyMode = False
+    
+End Sub
+
+Sub FormatandoAIR()
+    Dim wbAIR As Workbook
+    Dim wsAIR As Worksheet
+    Dim wsNova As Worksheet
+    Dim ws1Backlog As Worksheet
+    Dim ws2Backlog As Worksheet
+    Dim ultimalinha As Long
+    Dim wbBacklog As Workbook
+    Dim filtroRange As Range
+
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
+
+    On Error Resume Next
+    Set wbAIR = Workbooks("chamados_abertos_field_service.xlsx")
+    Set wsAIR = wbAIR.Sheets("Relatório")
+    Set wbBacklog = Workbooks("BACKLOG - REGIONAL I E II.xlsm")
+    Set ws1Backlog = wbBacklog.Sheets("procv")
+    Set ws2Backlog = wbBacklog.Sheets("Base- chamados abertos")
+    On Error GoTo 0
+        
+    Set wsNova = wbAIR.Sheets.Add(After:=wbAIR.Sheets(wbAIR.Sheets.Count))
+    wsNova.Name = "Planilha_Procv"
+    
+    ws1Backlog.Range("B2:C111").Copy
+    wsNova.Range("A1").PasteSpecial Paste:=xlPasteValues
+    Application.CutCopyMode = False
+
+    ultimalinha = wsAIR.Cells(wsAIR.Rows.Count, "A").End(xlUp).Row
+    wsAIR.Range("AO2:AO" & ultimalinha).FormulaR1C1 = "=VLOOKUP(RC[-1],'Planilha_Procv'!C1:C2,2,0)"
+    
+    Set filtroRange = wsAIR.Range("A1:AO" & ultimalinha)
+
+    filtroRange.AutoFilter Field:=41, Criteria1:=Array("C3", "C4", "C5"), Operator:=xlFilterValues
+    filtroRange.AutoFilter Field:=16, Criteria1:=Array("ATIVAÇÃO", "CLEAN-UP", "MUDANÇA DE CÔMODO", "MUDANÇA DE ENDEREÇO", "REPARO", "REPARO PREVENTIVO", "UPGRADE NÃO LÓGICO"), Operator:=xlFilterValues
+    filtroRange.AutoFilter Field:=14, Criteria1:=Array("[TEC]C_Falta de Material", "CANCEL_BOOT_ONU", "CANCEL_HUMANO_PRE_ANALISE", "CANCEL_REAGENDAMENTO_SOLICITADO", "CANCEL_SOLICITADO_GESTAO", "NR_ABERT_INDEVIDA", "NR_AGENDA_NAO_CUMPRIDO", "NR_CAIXA_CHEIA", "NR_CHUVA", "NR_CLIENTE_AUSENTE", "NR_DESISTENCIA_SERVICO", "NR_FALTA_MATERIAL", "NR_PROBLEMA_MASSIVO", "NR_REAGENDAMENTO_SOLICITADO", "NR_REDE_EXTERNA_PROBLEMA", "="), Operator:=xlFilterValues
+
+    wsAIR.Range("A1:AO" & ultimalinha).Copy
+    wbBacklog.Sheets("Base- chamados abertos").Range("AR1").PasteSpecial Paste:=xlPasteAll
+
+    Application.ScreenUpdating = True
+    Application.DisplayAlerts = True
+
+End Sub
+
+Sub Printando()
+    Dim wb As Workbook
+    Dim ws As Worksheet
+    Dim caminhoPDF As String
+    
+    On Error Resume Next
+    Set wb = Workbooks("BACKLOG - REGIONAL I E II.xlsm")
+    Set ws = wb.Sheets("Jerzio")
+    On Error GoTo 0
+    
+    If ws Is Nothing Then Exit Sub
+
+    With ws.PageSetup
+        .PrintArea = "$B$2:$P$353"
+        .Orientation = xlPortrait
+        .PaperSize = xlPaperA4
+        .FitToPagesWide = 1
+        .FitToPagesTall = False
+    End With
+
+    caminhoPDF = "C:\Users\barbara.gianvechio\Downloads\BACKLOG - REGIONAL I E II.pdf"
+    ws.ExportAsFixedFormat Type:=xlTypePDF, Filename:=caminhoPDF, Quality:=xlQualityStandard, IncludeDocProperties:=True, IgnorePrintAreas:=False, OpenAfterPublish:=False
+End Sub
+
+Sub Fechando()
+    Dim wbAIR As Workbook
+    Dim wbOFS As Workbook
+    Dim wbBacklog As Workbook
+    Dim wbDadosExtraidos As Workbook
+    Dim arquivo As String
+    Dim nomeInicioOFS As String: nomeInicioOFS = "Atividades-Casa Cliente"
+    Dim pasta As String: pasta = "C:\Users\barbara.gianvechio\Downloads\"
+    
+    Set wbBacklog = Workbooks("BACKLOG - REGIONAL I E II.xlsm")
+    Set wbAIR = Workbooks("chamados_abertos_field_service.xlsx")
+    Set wbDadosExtraidos = Workbooks("dados_extraidos.xlsx")
+    On Error Resume Next
+    Set wbOFS = Workbooks(nomeInicioOFS & "*.csv") ' Usando nome com wildcard para buscar o arquivo
+    On Error GoTo 0
+    
+    If Not wbOFS Is Nothing Then
+        wbOFS.Saved = True
+        wbOFS.Close
+    End If
+    
+    wbAIR.Saved = True
+    wbAIR.Close
+
+    wbBacklog.Saved = True
+    wbBacklog.Close
+    
+    wbDadosExtraidos.Saved = True
+    wbDadosExtraidos.Close
+    
+    ActiveWorkbook.Saved = True
+    ActiveWorkbook.Close
+End Sub
