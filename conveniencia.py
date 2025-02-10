@@ -49,7 +49,9 @@ driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div/div[2]/div/div[2]/
 time.sleep(2)
 driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[1]/a').click()
 time.sleep(2)
-driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/div/div/div[2]/div[5]/section/div[3]/input').click()
+driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/div/div/div[2]/div[5]/section/div[3]/input').click() #R8
+time.sleep(2)
+driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/div/div/div[2]/div[5]/section/div[6]/input').click() #R9
 time.sleep(2)
 
 footer = driver.find_element(By.TAG_NAME, "footer")
@@ -90,27 +92,27 @@ time.sleep(2)
 driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/div/div/div[1]/div[5]/section/div[3]/input').click() #reparo
 time.sleep(2)
 driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/div/div/div[1]/div[5]/section/div[4]/input').click() #reparo empresarial
-time.sleep(2)
+time.sleep(1)
 driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/div/div/div[1]/div[5]/section/div[9]/input').click() #reparo pme
-time.sleep(2)
+time.sleep(1)
 driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/div/div/div[1]/div[5]/section/div[10]/input').click() #reparo preventivo
-time.sleep(2)
+time.sleep(1)
 campo_texto.clear()
 driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/div/div/div[1]/div[5]/section/div[1]/input').send_keys('upgr')
-time.sleep(2)
+time.sleep(1)
 driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/div/div/div[1]/div[5]/section/div[3]/input').click() #upgrade
-time.sleep(2)
+time.sleep(1)
 driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/div/div/div[1]/div[5]/section/div[5]/input').click() #upgrade nao logico
-time.sleep(2)
+time.sleep(1)
 campo_texto.clear()
 campo_texto.send_keys('mudan')
-time.sleep(2)
+time.sleep(1)
 driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/div/div/div[1]/div[5]/section/div[3]/input').click() #mudanca de endereco
-time.sleep(2)
+time.sleep(1)
 driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/div/div/div[1]/div[5]/section/div[4]/input').click() #mudanca de comodo
-time.sleep(2)
+time.sleep(1)
 driver.find_element(By.XPATH, '//*[@id="app"]/div/section/div[3]/div[1]/div[2]/div/div/div[3]/div/div/form/footer/button[1]').click() #filtrar
-time.sleep(2)
+time.sleep(1)
 
 def salvar_excel(dados): 
     if dados:
@@ -121,32 +123,11 @@ def salvar_excel(dados):
         print("Nenhum dado foi coletado.")
         
 def pegar_informacao():
-    tem_proximo = '/html/body//div[2]/div/div/div/div[2]/div[2]/div/section/div[1]/div/div/div/table/tbody/tr[{numero}]'
+    driver.find_element(By.XPATH, '/html/body//div[2]/div/div/nav/div[2]/div/a[2]/span[2]').click()
+    numero_contrato = driver.find_element(By.XPATH, '/html/body//div[2]/div/div/div[2]/div[2]/div/div//div[2]/p[3]/span/span').text
+    pag.press('ESC')
 
-    def verifica(num):
-        xpath_proximo = tem_proximo.format(numero = num)
-        try:
-            driver.find_element(By.XPATH, xpath_proximo)
-            return True
-        except NoSuchElementException:
-            return False
-       
-    lista = True
-    i = 1
-    
-    while (lista):
-        lista = verifica(i)
-        if lista:
-            i = i + 1
-
-    if i == 1:
-        xpath_ultimo_da_lista = '/html/body//div[2]/div/div/div/div[2]/div[2]/div/section/div[1]/div/div/div/table/tbody/tr/td[3]/span'
-    else: 
-        ultimo_da_lista = '/html/body//div[2]/div/div/div/div[2]/div[2]/div/section/div[1]/div/div/div/table/tbody/tr[{numero}]/td[3]/span'
-        xpath_ultimo_da_lista = ultimo_da_lista.format(numero = i-1)
-    os_chamado = driver.find_element(By.XPATH,xpath_ultimo_da_lista).text
-    print (os_chamado)
-    return os_chamado
+    return numero_contrato
     
 def verificar_conveniencia() :
     quadradinho_para_formatar = '//*[@id="app"]/div/section/div[3]/div[2]/div[2]/table/tbody/tr[{numero}]/td[19]/span/span/button'
@@ -165,13 +146,11 @@ def verificar_conveniencia() :
                     driver.find_element(By.XPATH, xpath_conveniencia).click()
                     time.sleep(2)                             
                     numero = pegar_informacao()
-                    
+
                     if numero is not None:
                         dados.append({"Número": numero})
                     else:
                         break  # Sai do loop quando não encontrar mais tópicos
-                    
-                    pag.press('ESC')
                     
                 except Exception as e:
                     print(f"Erro ao clicar no item {i+1}: {e}")
