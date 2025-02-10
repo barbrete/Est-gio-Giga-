@@ -8,6 +8,7 @@ import pandas as pd
 from selenium.webdriver.common.action_chains import ActionChains
 import win32com.client
 import os
+import subprocess
 
 # Ainda falta colocar ele pra rodar pra sempre e queria fazer uma verificação para
 # ver se os sites estão fora do ar ou nao
@@ -123,6 +124,8 @@ while (tem == False):
 
 driver.quit()
 print(demorou_quanto_tempo)
+
+subprocess.run("python conveniencia.py")
 
 def run_excel_macro():
     try:
