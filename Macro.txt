@@ -12,8 +12,6 @@ Sub Backlog()
     Printando
     Fechando
 
-    Application.ScreenUpdating = True
-    Application.DisplayAlerts = True
 End Sub
 
 Sub AbrirArquivos()
@@ -60,15 +58,27 @@ End Sub
 
 
 Sub FormatandoOFS()
-    Dim wsOFS As Worksheet
     Dim wbOFS As Workbook
+    Dim wsOFS As Worksheet
+    Dim dataAtual As String
+    Dim nomePlanilha As String
+    Dim ultimalinha
     On Error Resume Next
     
-    Set wbOFS = Workbooks("Atividades-Casa Cliente_07_02_25.csv")
+    dataAtual = Format(Date, "dd_mm_yy")
+    
+    Set wbOFS = Workbooks("Atividades-Casa Cliente_" & dataAtual & ".csv")
+    
     On Error GoTo 0
     
+    nomePlanilha = "Atividades-Casa Cliente_" & dataAtual & "2"
+
+    If Len(nomePlanilha) > 31 Then
+        nomePlanilha = Left(nomePlanilha, 31)
+    End If
+    
     If Not wbOFS Is Nothing Then
-        Set wsOFS = wbOFS.Sheets("Atividades-Casa Cliente_07_02_2")
+        Set wsOFS = wbOFS.Sheets(nomePlanilha)
         If Not wsOFS Is Nothing Then
             If IsEmpty(wsOFS.Cells(1, 2)) Then
                 wsOFS.Columns("A:A").TextToColumns Destination:=wsOFS.Range("A1"), DataType:=xlDelimited, _
@@ -83,12 +93,15 @@ Sub FormatandoOFS()
                     Array(37, 1), Array(38, 1), Array(39, 1), Array(40, 1), Array(41, 1), Array(42, 1), _
                     Array(43, 1), Array(44, 1)), TrailingMinusNumbers:=True
             End If
+            
+                
+            ultimalinha = wsOFS.Cells(wsOFS.Rows.Count, "A").End(xlUp).Row
         
-            wsOFS.Range("A1:AR15000").Copy
+            wsOFS.Range("A1:AR" & ultimalinha).Copy
             Windows("BACKLOG - REGIONAL I E II.xlsm").Activate
             Sheets("Base- OFS").Range("G1").PasteSpecial Paste:=xlPasteAll
         Else
-            MsgBox "A planilha 'Atividades-Casa Cliente_07_02_25' não foi encontrada.", vbExclamation, "Erro"
+            MsgBox "A planilha 'Atividades-Casa Cliente_" & dataAtual & "' não foi encontrada.", vbExclamation, "Erro"
         End If
     Else
         MsgBox "A planilha 'OFS' não foi encontrada.", vbExclamation, "Erro"
@@ -156,7 +169,8 @@ Sub FormatandoAIR()
     wsAIR.Range("AO2:AO" & ultimalinha).FormulaR1C1 = "=VLOOKUP(RC[-1],'Planilha_Procv'!C1:C2,2,0)"
     
     Set filtroRange = wsAIR.Range("A1:AO" & ultimalinha)
-
+    
+    'verificar se tem mais filtros disponiveis
     filtroRange.AutoFilter Field:=41, Criteria1:=Array("C3", "C4", "C5"), Operator:=xlFilterValues
     filtroRange.AutoFilter Field:=16, Criteria1:=Array("ATIVAÇÃO", "CLEAN-UP", "MUDANÇA DE CÔMODO", "MUDANÇA DE ENDEREÇO", "REPARO", "REPARO PREVENTIVO", "UPGRADE NÃO LÓGICO"), Operator:=xlFilterValues
     filtroRange.AutoFilter Field:=14, Criteria1:=Array("[TEC]C_Falta de Material", "CANCEL_BOOT_ONU", "CANCEL_HUMANO_PRE_ANALISE", "CANCEL_REAGENDAMENTO_SOLICITADO", "CANCEL_SOLICITADO_GESTAO", "NR_ABERT_INDEVIDA", "NR_AGENDA_NAO_CUMPRIDO", "NR_CAIXA_CHEIA", "NR_CHUVA", "NR_CLIENTE_AUSENTE", "NR_DESISTENCIA_SERVICO", "NR_FALTA_MATERIAL", "NR_PROBLEMA_MASSIVO", "NR_REAGENDAMENTO_SOLICITADO", "NR_REDE_EXTERNA_PROBLEMA", "="), Operator:=xlFilterValues
@@ -198,31 +212,32 @@ Sub Fechando()
     Dim wbOFS As Workbook
     Dim wbBacklog As Workbook
     Dim wbDadosExtraidos As Workbook
-    Dim arquivo As String
-    Dim nomeInicioOFS As String: nomeInicioOFS = "Atividades-Casa Cliente"
-    Dim pasta As String: pasta = "C:\Users\barbara.gianvechio\Downloads\"
-    
+    Dim dataAtual As String
+     
     Set wbBacklog = Workbooks("BACKLOG - REGIONAL I E II.xlsm")
     Set wbAIR = Workbooks("chamados_abertos_field_service.xlsx")
     Set wbDadosExtraidos = Workbooks("dados_extraidos.xlsx")
+    
+    dataAtual = Format(Date, "dd_mm_yy")
+    
+    Set wbOFS = Workbooks("Atividades-Casa Cliente_" & dataAtual & ".csv")
+    
     On Error Resume Next
-    Set wbOFS = Workbooks(nomeInicioOFS & "*.csv") ' Usando nome com wildcard para buscar o arquivo
     On Error GoTo 0
     
-    If Not wbOFS Is Nothing Then
-        wbOFS.Saved = True
-        wbOFS.Close
-    End If
+    wbOFS.Saved = True
+    wbOFS.Close
     
     wbAIR.Saved = True
     wbAIR.Close
+    
+    wbDadosExtraidos.Saved = True
+    wbDadosExtraidos.Close
 
     wbBacklog.Saved = True
     wbBacklog.Close
     
-    wbDadosExtraidos.Saved = True
-    wbDadosExtraidos.Close
+    Application.ScreenUpdating = True
+    Application.DisplayAlerts = True
     
-    ActiveWorkbook.Saved = True
-    ActiveWorkbook.Close
 End Sub
