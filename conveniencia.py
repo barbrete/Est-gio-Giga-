@@ -207,3 +207,4 @@ def verificar_conveniencia() :
 diminui_tela()
 verificar_conveniencia()
 arruma_tela()
+driver.quit()
