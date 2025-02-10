@@ -127,9 +127,9 @@ Sub Conveniencia()
     
     ultimalinha = wsBacklogOFS.Cells(wsDadosExtraidos.Rows.Count, "G").End(xlUp).Row
     ultimalinha = ultimalinha + 1
-    wsBacklogOFS.Range("AI" & ultimalinha).PasteSpecial Paste:=xlPasteAll
+    wsBacklogOFS.Range("AM" & ultimalinha).PasteSpecial Paste:=xlPasteAll
     
-    ultimalinhaConveniencia = wsBacklogOFS.Cells(wsBacklogOFS.Rows.Count, "AI").End(xlUp).Row
+    ultimalinhaConveniencia = wsBacklogOFS.Cells(wsBacklogOFS.Rows.Count, "AM").End(xlUp).Row
     
     wsBacklogOFS.Range("I" & ultimalinha & ":I" & ultimalinhaConveniencia).Value = "CONVENIENCIA"
 
